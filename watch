@@ -48,14 +48,14 @@ function restore {
   fi
 
   echo "restoring $REMOTE => $LOCAL"
-  if ! aws s3 sync "$REMOTE" "$LOCAL"; then
+  if ! aws s3 sync "$REMOTE" "$LOCAL" --exclude ".*"; then
     error_exit "restore failed"
   fi
 }
 
 function backup {
   echo "backup $LOCAL => $REMOTE"
-  if ! aws s3 sync "$LOCAL" "$REMOTE" --delete; then
+  if ! aws s3 sync "$LOCAL" "$REMOTE" --delete --exclude ".*"; then
     echo "backup failed" 1>&2
     return 1
   fi
@@ -63,7 +63,7 @@ function backup {
 
 function final_backup {
   echo "backup $LOCAL => $REMOTE"
-  while ! aws s3 sync "$LOCAL" "$REMOTE" --delete; do
+  while ! aws s3 sync "$LOCAL" "$REMOTE" --delete --exclude ".*"; do
     echo "backup failed, will retry" 1>&2
     sleep 1
   done
